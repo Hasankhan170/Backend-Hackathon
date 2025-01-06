@@ -2,26 +2,26 @@ import mongoose from "mongoose";
 
 
 const productSchema = new mongoose.Schema({
-        content: {
+        name: {
             type: String,
             required: true
         },
-        createdBy: { 
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Users',
+        description : {
+            type: String,
             required: true
         },
-        quantity: {
-            type: Number,
+        user: { 
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Users',
             required: true
         },
         price : {
             type: Number,
             required: true
         },
-        comments : [{
+        orderItems  : [{
             type : mongoose.Schema.Types.ObjectId,
-            ref : 'Comments'
+            ref : 'Order'
         }],
         image : {
             type: String,

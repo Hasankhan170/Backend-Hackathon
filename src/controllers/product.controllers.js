@@ -27,11 +27,11 @@ const uploadImgToCloudinary = async (filePath) => {
 };
 
 const createPost = async (req, res)=>{
-    const {content,price,quantity} = req.body;
+    const {name,description,price,} = req.body;
     const {userId} = req.params;
-    if(!content) return res.status(404).json({message:"Please enter a content"})
+    if(!name) return res.status(404).json({message:"Please enter a name"})
     if(!price) return res.status(404).json({message:"Please enter a price"})
-    if(!quantity) return res.status(404).json({message:"Please enter a quantity"})
+    if(!description) return res.status(404).json({message:"Please enter a description"})
     if (!req.file) return res.status(400).json({ message: "Image is required" });
     const user = await Users.findById(userId)
     if(!user) return res.status(404).json({message:"User not found"})
@@ -39,10 +39,10 @@ const createPost = async (req, res)=>{
     try {
         const imageUrl = await uploadImgToCloudinary(req.file.path)
         const newPost = await Product.create({
-            content,
+            name,
             price,
-            quantity,
-            createdBy: userId,
+            description,
+            user: userId,
             image: imageUrl
         })
     
@@ -118,8 +118,8 @@ const deleteSinglePost = async (req,res)=>{
 
 const editSinglePost = async (req,res)=>{
     const {userId,productId} = req.params
-    const {content, price, quantity} = req.body;
-    if (!content && !price && !quantity) {
+    const {name, price, description} = req.body;
+    if (!name && !price && !description) {
         return res.status(400).json({ message: "Please provide at least one field to update" });
     }
 
