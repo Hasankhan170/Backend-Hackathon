@@ -79,7 +79,7 @@ const singleUserPost = async (req, res)=>{
     })
 }
 
-const getAllUsers = async (req,res)=>{
+const getAllProducts = async (req,res)=>{
     const page = parseInt(req.query.page) || 1
     const limit = parseInt(req.query.limit) || 5;
 
@@ -105,15 +105,20 @@ const getAllUsers = async (req,res)=>{
 }
 
 const deleteSinglePost = async (req,res)=>{
-    const {userId, productId} = req.params;
+    const {id} = req.params;
+    const userId = req.user.id
     const user = await Users.findById(userId)
     if(!user) return res.status(404).json({message : "User not found"})
+
+    if (user.role !== 'admin') {
+        return res.status(403).json({ message: "Unauthorized: Only admin can delete posts" });
+    }
     
-    const postDelete = await Product.findByIdAndDelete(productId)
+    const postDelete = await Product.findByIdAndDelete(id)
     if(!postDelete) return res.status(404).json({message : "Product not found"})
     // /Pull MongoDB ka ek update operator hai jo kisi array se ek specific value ko nikalne ke liye use hota hai
     await user.updateOne({
-        $pull : {products : productId}
+        $pull : {products : id}
     })
 
     const updatedUser = await Users.findById(userId).populate("products");
@@ -188,4 +193,4 @@ const editSinglePost = async (req,res)=>{
 // };
 
 
-export {createPost,singleUserPost,getAllUsers,deleteSinglePost,editSinglePost}
+export {createPost,singleUserPost,getAllProducts,deleteSinglePost,editSinglePost}
