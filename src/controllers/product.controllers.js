@@ -26,6 +26,7 @@ const uploadImgToCloudinary = async (filePath) => {
       }
 };
 
+//admin create post
 const createPost = async (req, res) => {
     const { name, description, price} = req.body;
     if (!name) return res.status(400).json({ message: "Please enter a name" });
@@ -68,8 +69,9 @@ const createPost = async (req, res) => {
     }
 };
 
-
+//get single post
 const singleUserPost = async (req, res)=>{
+   try {
     const {id} = req.params;
     const user = await Users.findById(id).populate("products");
     if(!user) return res.status(404).json({message : "User not found"})
@@ -77,11 +79,16 @@ const singleUserPost = async (req, res)=>{
         message : "post found",
         user
     })
+   } catch (error) {
+    console.log(error);
+    
+   }
 }
 
+//get all post
 const getAllProducts = async (req,res)=>{
     const page = parseInt(req.query.page) || 1
-    const limit = parseInt(req.query.limit) || 5;
+    const limit = parseInt(req.query.limit) || 10;
 
     const skip = (page -1) * limit
     try {
@@ -104,6 +111,7 @@ const getAllProducts = async (req,res)=>{
     }
 }
 
+//edit single post
 const deleteSinglePost = async (req,res)=>{
     const {id} = req.params;
     const userId = req.user.id
@@ -114,9 +122,10 @@ const deleteSinglePost = async (req,res)=>{
         return res.status(403).json({ message: "Unauthorized: Only admin can delete posts" });
     }
     
-    const postDelete = await Product.findByIdAndDelete(id)
+    try {
+        const postDelete = await Product.findByIdAndDelete(id)
     if(!postDelete) return res.status(404).json({message : "Product not found"})
-    // /Pull MongoDB ka ek update operator hai jo kisi array se ek specific value ko nikalne ke liye use hota hai
+    //Pull MongoDB ka ek update operator hai jo kisi array se ek specific value ko nikalne ke liye use hota hai
     await user.updateOne({
         $pull : {products : id}
     })
@@ -126,8 +135,13 @@ const deleteSinglePost = async (req,res)=>{
         message: "Product deleted successfully",
         user: postDelete
     })
+    } catch (error) {
+        console.log(error);
+        
+    }
 }
 
+//edit single post
 const editSinglePost = async (req,res)=>{
     const {id} = req.params;
     const userId = req.user.id
@@ -141,7 +155,8 @@ const editSinglePost = async (req,res)=>{
     if (user.role !== 'admin') {
             return res.status(403).json({ message: "Unauthorized: Only admin can delete posts" });
     }
-    const editProduct = await Product.findByIdAndUpdate(id,req.body) 
+    try {
+        const editProduct = await Product.findByIdAndUpdate(id,req.body) 
     if(!editProduct) return res.status(404).json({message : "Product not found"})
     
     const updatePorduct = await Product.findById(id)
@@ -149,6 +164,10 @@ const editSinglePost = async (req,res)=>{
         message: "Product updated successfully",
         user: updatePorduct
     })
+    } catch (error) {
+        console.log(error);
+        
+    }
 }
 
 // const stripe = Stripe(process.env.STRIPE_SECRET_KEY)
