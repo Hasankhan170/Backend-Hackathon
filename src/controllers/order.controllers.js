@@ -4,7 +4,7 @@ import Order from "../models/user.order.js"
 
 
 
-
+//customer create order
 const orderCreate = async (req,res)=>{
     const {id,quantity} = req.body
     const userId = req.user.id;
@@ -14,7 +14,9 @@ const orderCreate = async (req,res)=>{
      if (user.role !== "customer") {
             return res.status(403).json({ message: "Unauthorized: Only customers can place orders" });
     }
-    const product = await Product.findById(id)
+
+    try {
+        const product = await Product.findById(id)
     if(!product) return res.status(404).json({message:"Product not found"})
 
     const totalPrice = product.price * quantity
@@ -44,11 +46,17 @@ const orderCreate = async (req,res)=>{
         message:"Order created successfully",
         order
     })
+    } catch (error) {
+        console.log(error);
+        
+    }
 
 
 }
 
+//get order list
 const orderList = async (req,res)=>{
+   try {
     const userId = req.user.id;
     const user = await Users.findById(userId).populate("orders")
     if(!user) return res.status(404).json({message:"User not found"})
@@ -57,9 +65,15 @@ const orderList = async (req,res)=>{
         message:"Order list",
         orders: user.orders
     })
+   } catch (error) {
+    console.log(error);
+    
+   }
 }
 
+//get single order
 const singleOrder = async (req,res)=>{
+   try {
     const {id} = req.params;
     const user = await Order.findById(id).populate("products")
     if(!user) return res.status(404).json({message:"User not found"})
@@ -68,6 +82,10 @@ const singleOrder = async (req,res)=>{
         message:"Single order",
         order: user
     })
+   } catch (error) {
+    console.log(error);
+    
+   }
     
 }
 
