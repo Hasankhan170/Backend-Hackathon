@@ -27,15 +27,19 @@ const uploadImgToCloudinary = async (filePath) => {
 };
 
 const createPost = async (req, res) => {
-    const { name, description, price ,id} = req.body;
+    const { name, description, price} = req.body;
     if (!name) return res.status(400).json({ message: "Please enter a name" });
     if (!price) return res.status(400).json({ message: "Please enter a price" });
     if (!description) return res.status(400).json({ message: "Please enter a description" });
     if (!req.file) return res.status(400).json({ message: "Image is required" });
 
-    const userId = req.user.id; // Extract userId from authenticated token
+    const userId = req.user.id; 
     const user = await Users.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (user.role !== 'admin') {
+        return res.status(403).json({ message: "Unauthorized: Only admin can create a product" });
+    }
 
     try {
         const imageUrl = await uploadImgToCloudinary(req.file.path);
@@ -47,9 +51,11 @@ const createPost = async (req, res) => {
             user: user._id
         });
 
-        await user.updateOne({
-            $push: { products: newPost._id }
-        });
+        if (user.role === 'admin') {
+            await user.updateOne({
+                $push: { products: newPost._id }
+            });
+        }
 
         const updatedUser = await Users.findById(userId).populate("products");
         res.status(200).json({

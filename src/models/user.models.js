@@ -15,10 +15,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    role: {
+    role: { 
         type: String,
-        enum: ['admin', 'customer'],
-        required: true
+        default: 'customer' 
     },
     products :[{
         type : mongoose.Schema.Types.ObjectId,

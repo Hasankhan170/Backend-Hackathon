@@ -1,8 +1,11 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import User from "../models/user.models.js";
+// import nodemailer from 'nodemailer';
+
+
 const generateAccessToken = (user) => {
-    return jwt.sign({ email: user.email, id: user._id }, process.env.ACCESS_TOKEN, { expiresIn: '6h' });
+    return jwt.sign({ email: user.email, id: user._id}, process.env.ACCESS_TOKEN, { expiresIn: '6h' });
 };
 
 
@@ -13,24 +16,46 @@ const generateRefreshToken = (user)=>{
     })
 }
 
-
-
 const register = async(req,res)=>{
     const {username,email,password,role} = req.body
     if(!username) return res.status(404).json({message:"Please enter a name"})
     if(!email) return res.status(404).json({message:"Please enter a email"})
     if(!password) return res.status(404).json({message:"Please enter a password"})
-    if(role && ["admin", "customer"].indexOf(role) === -1) return res.status(400).json({message:"Invalid role"})
+    const allowedRoles = ["admin", "customer"];
+    if (role && !allowedRoles.includes(role)) {
+        return res.status(400).json({ message: "Invalid role" });
+    }
 
     const user = await User.findOne({email: email})
     if(user) return res.status(400).json({message:"User already exists"})
 
-    const userCreate = await User.create({
-        username,
-        email,
-        password,
-        role
-    })
+        const userCreate = await User.create({
+            username,
+            email,
+            password,
+            role: role || 'customer',
+            ...(role === 'admin' ? { products: [] } : {})
+        })
+    
+
+    // const transporter = nodemailer.createTransport({
+    //         service: 'Gmail',
+    //         auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+    // });
+        
+    // const mailOptions = {
+    //         from: process.env.EMAIL_USER,
+    //         to: email,
+    //         subject: 'Welcome to Our Platform',
+    //         text: `Welcome, ${username}! Thank you for registering.`,
+    // };
+    // await transporter.sendMail(mailOptions);
+
+    if (userCreate.role === 'customer') {
+        userCreate.products = undefined;
+        await userCreate.save();  
+    }
+
 
     res.status(200).json({
         message:"User registered successfully",
@@ -38,6 +63,9 @@ const register = async(req,res)=>{
     })
 
 }
+
+
+
 
 const login = async(req,res)=>{
     const {email,password} = req.body

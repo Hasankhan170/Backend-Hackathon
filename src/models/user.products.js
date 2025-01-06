@@ -19,10 +19,6 @@ const productSchema = new mongoose.Schema({
             type: Number,
             required: true
         },
-        orderItems  : [{
-            type : mongoose.Schema.Types.ObjectId,
-            ref : 'Order'
-        }],
         image : {
             type: String,
             required: [true, "image is required"]

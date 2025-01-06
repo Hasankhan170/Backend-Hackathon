@@ -4,7 +4,7 @@ import { upload } from "../middleware/multer.middleware.js";
 import authenticateUser from "../middleware/auth.middleware.js"
 
 const router = express.Router();
-router.post("/createPost", authenticateUser, upload.single("image"), createPost);
+router.post("/createPost", authenticateUser,upload.single("image"), createPost);
 
 router.get("/singleUserPost/:id",singleUserPost)
 router.delete("/deletePost/:userId/:productId",deleteSinglePost)
