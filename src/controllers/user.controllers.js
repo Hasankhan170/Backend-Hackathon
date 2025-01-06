@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import User from "../models/user.models.js";
-// import nodemailer from 'nodemailer';
+import { sendWelcomeEmail } from "../utils/nodemailer.utils.js";
 
 
 const generateAccessToken = (user) => {
@@ -38,22 +38,15 @@ const register = async(req,res)=>{
         })
     
 
-    // const transporter = nodemailer.createTransport({
-    //         service: 'Gmail',
-    //         auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-    // });
-        
-    // const mailOptions = {
-    //         from: process.env.EMAIL_USER,
-    //         to: email,
-    //         subject: 'Welcome to Our Platform',
-    //         text: `Welcome, ${username}! Thank you for registering.`,
-    // };
-    // await transporter.sendMail(mailOptions);
+
 
     if (userCreate.role === 'customer') {
         userCreate.products = undefined;
         await userCreate.save();  
+    }
+
+    if (userCreate) {
+        await sendWelcomeEmail(userCreate.email);  // Send welcome email
     }
 
 
