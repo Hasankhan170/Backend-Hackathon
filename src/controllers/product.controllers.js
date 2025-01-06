@@ -129,7 +129,8 @@ const deleteSinglePost = async (req,res)=>{
 }
 
 const editSinglePost = async (req,res)=>{
-    const {userId,productId} = req.params
+    const {id} = req.params;
+    const userId = req.user.id
     const {name, price, description} = req.body;
     if (!name && !price && !description) {
         return res.status(400).json({ message: "Please provide at least one field to update" });
@@ -137,10 +138,13 @@ const editSinglePost = async (req,res)=>{
 
     const user= await Users.findById(userId)
     if(!user) return res.status(404).json({message : "User not found"})
-    const editProduct = await Product.findByIdAndUpdate(productId,req.body) 
+    if (user.role !== 'admin') {
+            return res.status(403).json({ message: "Unauthorized: Only admin can delete posts" });
+    }
+    const editProduct = await Product.findByIdAndUpdate(id,req.body) 
     if(!editProduct) return res.status(404).json({message : "Product not found"})
     
-    const updatePorduct = await Product.findById(productId)
+    const updatePorduct = await Product.findById(id)
     res.status(200).json({
         message: "Product updated successfully",
         user: updatePorduct

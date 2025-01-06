@@ -10,7 +10,7 @@ router.post("/products", authenticateUser,upload.single("image"), createPost);
 router.get("/products",getAllProducts)
 router.get("/products/:id",singleUserPost)
 router.delete("/products/:id",authenticateUser,deleteSinglePost)
-router.put("/products/:id",editSinglePost)
+router.put("/products/:id",authenticateUser,editSinglePost)
 // router.post("/payment",ProductPayment);
 
 
