@@ -24,8 +24,8 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.use("/api/user", userRoute);
-app.use("/api/post", postRouter);
+app.use("/auth", userRoute);
+app.use("/products", postRouter);
 
 
 

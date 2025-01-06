@@ -26,45 +26,46 @@ const uploadImgToCloudinary = async (filePath) => {
       }
 };
 
-const createPost = async (req, res)=>{
-    const {name,description,price,} = req.body;
-    const {userId} = req.params;
-    if(!name) return res.status(404).json({message:"Please enter a name"})
-    if(!price) return res.status(404).json({message:"Please enter a price"})
-    if(!description) return res.status(404).json({message:"Please enter a description"})
+const createPost = async (req, res) => {
+    const { name, description, price ,id} = req.body;
+    if (!name) return res.status(400).json({ message: "Please enter a name" });
+    if (!price) return res.status(400).json({ message: "Please enter a price" });
+    if (!description) return res.status(400).json({ message: "Please enter a description" });
     if (!req.file) return res.status(400).json({ message: "Image is required" });
-    const user = await Users.findById(userId)
-    if(!user) return res.status(404).json({message:"User not found"})
-    
+
+    const userId = req.user.id; // Extract userId from authenticated token
+    const user = await Users.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
     try {
-        const imageUrl = await uploadImgToCloudinary(req.file.path)
+        const imageUrl = await uploadImgToCloudinary(req.file.path);
         const newPost = await Product.create({
             name,
             price,
             description,
-            user: userId,
-            image: imageUrl
-        })
-    
+            image: imageUrl,
+            user: user._id
+        });
+
         await user.updateOne({
-            $push : {products : newPost._id}
-        })
-    
-    
+            $push: { products: newPost._id }
+        });
+
         const updatedUser = await Users.findById(userId).populate("products");
         res.status(200).json({
             message: "Post created successfully",
-            user: newPost
+            post: newPost
         });
     } catch (error) {
         console.log(error);
-        
+        res.status(500).json({ message: "Something went wrong" });
     }
-}
+};
+
 
 const singleUserPost = async (req, res)=>{
-    const {userId} = req.params;
-    const user = await Users.findById(userId).populate("products");
+    const {id} = req.params;
+    const user = await Users.findById(id).populate("products");
     if(!user) return res.status(404).json({message : "User not found"})
     res.status(200).json({
         message : "post found",

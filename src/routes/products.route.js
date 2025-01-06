@@ -1,14 +1,16 @@
 import express from 'express';
 import { createPost, singleUserPost,getAllUsers,deleteSinglePost,editSinglePost } from '../controllers/product.controllers.js';
 import { upload } from "../middleware/multer.middleware.js";
-const router = express.Router();
+import authenticateUser from "../middleware/auth.middleware.js"
 
-router.post("/createPost/:userId", upload.single("image"),createPost);
-router.get("/singleUserPost/:userId",singleUserPost)
+const router = express.Router();
+router.post("/createPost", authenticateUser, upload.single("image"), createPost);
+
+router.get("/singleUserPost/:id",singleUserPost)
 router.delete("/deletePost/:userId/:productId",deleteSinglePost)
 router.put("/editPost/:userId/:productId",editSinglePost)
 
-router.get("/getAllUsers",getAllUsers)
+router.get("/getAllProducts",getAllUsers)
 // router.post("/payment",ProductPayment);
 
 
