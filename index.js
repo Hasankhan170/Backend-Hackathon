@@ -5,6 +5,8 @@ import cors from 'cors'
 // import cookieParser from 'cookie-parser';
 import userRoute from "./src/routes/user.route.js"
 import postRouter from "./src/routes/products.route.js"
+import orderRouter from "./src/routes/order.route.js"
+
 
 
 
@@ -26,6 +28,8 @@ app.get("/", (req, res) => {
 
 app.use("/auth", userRoute);
 app.use("/products", postRouter);
+app.use("/orders", orderRouter);
+
 
 
 
