@@ -6,6 +6,7 @@ import cors from 'cors'
 import userRoute from "./src/routes/user.route.js"
 import postRouter from "./src/routes/products.route.js"
 import orderRouter from "./src/routes/order.route.js"
+// import { swaggerSpec, swaggerUi } from './src/swagger.js';
 
 
 
@@ -21,7 +22,24 @@ app.use(express.json())
 // app.use(cookieParser())
 
 
-
+// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+//   customCss: '.swagger-ui .topbar { display: none }', // Customize UI if needed
+//   customSiteTitle: 'My API Documentation',
+//   swaggerOptions: {
+//     authAction: {
+//       Bearer: {
+//         name: 'Bearer',
+//         schema: {
+//           type: 'apiKey',
+//           in: 'header',
+//           name: 'Authorization',
+//           description: 'Enter your JWT token in the format `Bearer <token>`',
+//         },
+//         value: 'Bearer <your-token>', // You can initialize it with a default value (optional)
+//       },
+//     },
+//   },
+// }));
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
